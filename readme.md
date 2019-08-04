@@ -1,4 +1,4 @@
-To start celsius, type java -jar Polisher.jar in the installation directory.
+To start polisher, type java -jar Polisher.jar in the installation directory.
 
 ## Introduction
 
