@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Element;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -36,13 +37,13 @@ public class mainFrame extends javax.swing.JFrame {
     public int[] ends;
     public String[] messages;
     public int[] severities;
-    final JFileChooser fc;
+    
+    public ArrayList<Problem> problems;
 
     /**
      * Creates new form mainFrame
      */
     public mainFrame() {
-        this.fc = new JFileChooser();
         RSC=new Resources(this);
         initComponents();
     }
@@ -61,6 +62,13 @@ public class mainFrame extends javax.swing.JFrame {
         int i=jTPSource.getText().indexOf("\\begin{document}");
         if (i>0) {
             jTPSource.getStyledDocument().setCharacterAttributes(0,i,RSC.sasGray, false);
+        }
+
+        // header grey
+        int startBibPos=jTPSource.getText().indexOf("@!@Bibliography@!@");
+        int length=jTPSource.getText().length();
+        if (startBibPos>0) {
+            jTPSource.getStyledDocument().setCharacterAttributes(startBibPos,length,RSC.sasGreen, false);
         }
         
         // references green
@@ -94,22 +102,26 @@ public class mainFrame extends javax.swing.JFrame {
     }
     
     public void findProblems() {
-        RSC.findProblems(jTPSource.getText());
-        int size=RSC.problems.size();
+        problems=RSC.findProblems(jTPSource.getText(),RSC.globalRules);
+        int size=problems.size();
         starts=new int[size+1];
         ends=new int[size];
         messages=new String[size];
         severities=new int[size];
         pcount=size;
         for (int i=0;i<pcount;i++) {
-            starts[i]=RSC.problems.get(i).start;
-            ends[i]=RSC.problems.get(i).end;
-            messages[i]=RSC.problems.get(i).message;
-            severities[i]=RSC.problems.get(i).severity;
+            starts[i]=problems.get(i).start;
+            ends[i]=problems.get(i).end;
+            messages[i]=problems.get(i).message;
+            severities[i]=problems.get(i).severity;
         }
         starts[pcount]=jTPSource.getText().length();
         jTFProblems.setText("Problems found: "+Integer.toString(pcount));
         markProblems();
+    }
+    
+    public void clearMarking() {
+        
     }
     
     public void loadText(String contents) {
@@ -145,13 +157,13 @@ public class mainFrame extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMFile = new javax.swing.JMenu();
         jMIOpen = new javax.swing.JMenuItem();
+        jMIReload = new javax.swing.JMenuItem();
         jMISave = new javax.swing.JMenuItem();
         jMEdit = new javax.swing.JMenu();
         jMIPreviousProblem = new javax.swing.JMenuItem();
         jMINextProblem = new javax.swing.JMenuItem();
         jMTools = new javax.swing.JMenu();
-        jMUpdateHighlighting = new javax.swing.JMenuItem();
-        jMFindProblems = new javax.swing.JMenuItem();
+        jMTester = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         jMReloadRules = new javax.swing.JMenuItem();
         jMHelp = new javax.swing.JMenu();
@@ -260,6 +272,14 @@ public class mainFrame extends javax.swing.JFrame {
         });
         jMFile.add(jMIOpen);
 
+        jMIReload.setText("Reload ");
+        jMIReload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIReloadActionPerformed(evt);
+            }
+        });
+        jMFile.add(jMIReload);
+
         jMISave.setText("Save");
         jMISave.setEnabled(false);
         jMISave.addActionListener(new java.awt.event.ActionListener() {
@@ -297,23 +317,13 @@ public class mainFrame extends javax.swing.JFrame {
 
         jMTools.setText("Tools");
 
-        jMUpdateHighlighting.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_U, java.awt.event.InputEvent.ALT_MASK));
-        jMUpdateHighlighting.setText("Update Highlighting");
-        jMUpdateHighlighting.addActionListener(new java.awt.event.ActionListener() {
+        jMTester.setText("Test a regular expression");
+        jMTester.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMUpdateHighlightingActionPerformed(evt);
+                jMTesterActionPerformed(evt);
             }
         });
-        jMTools.add(jMUpdateHighlighting);
-
-        jMFindProblems.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.ALT_MASK));
-        jMFindProblems.setText("Find Problems");
-        jMFindProblems.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMFindProblemsActionPerformed(evt);
-            }
-        });
-        jMTools.add(jMFindProblems);
+        jMTools.add(jMTester);
         jMTools.add(jSeparator1);
 
         jMReloadRules.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.ALT_MASK));
@@ -345,7 +355,7 @@ public class mainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMIAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAboutActionPerformed
-        // TODO add your handling code here:
+        RSC.Information(this, RSC.aboutText, "About Polisher "+RSC.VersionNumber);// TODO add your handling code here:
     }//GEN-LAST:event_jMIAboutActionPerformed
 
     private void jTPSourceCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_jTPSourceCaretUpdate
@@ -388,14 +398,6 @@ public class mainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTFProblemsActionPerformed
 
-    private void jMFindProblemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMFindProblemsActionPerformed
-        findProblems();
-    }//GEN-LAST:event_jMFindProblemsActionPerformed
-
-    private void jMUpdateHighlightingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMUpdateHighlightingActionPerformed
-        updateHighlighting();
-    }//GEN-LAST:event_jMUpdateHighlightingActionPerformed
-
     private void jMIPreviousProblemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIPreviousProblemActionPerformed
         int pos = jTPSource.getCaretPosition();
         int p=pcount-1;
@@ -415,14 +417,21 @@ public class mainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMReloadRulesActionPerformed
 
     private void jMIOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIOpenActionPerformed
-        int returnVal = fc.showOpenDialog(this);
-
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
+        JFileChooser FC = new JFileChooser();
+        FC.setDialogTitle("Select main tex-file");
+        FC.setDialogType(JFileChooser.OPEN_DIALOG);
+        FC.setFileFilter(new FFilter("tex", "TeX-files"));
+        RSC.setComponentFont(FC.getComponents());
+        if (!(FC.showOpenDialog(this) == JFileChooser.CANCEL_OPTION)) {
+            File file = FC.getSelectedFile();
             RSC.currentFN=file.getAbsolutePath();
+            jTPSource.setDocument(new DefaultStyledDocument());
+            jTPSource.setText("");
             RSC.openFile(RSC.currentFN);
+            findProblems();
+            updateHighlighting();
             jMISave.setEnabled(true);
-        } 
+        }
     }//GEN-LAST:event_jMIOpenActionPerformed
 
     private void jMISaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISaveActionPerformed
@@ -437,6 +446,22 @@ public class mainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMISaveActionPerformed
 
+    private void jMTesterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMTesterActionPerformed
+        RegExpTester RET=new RegExpTester(RSC);
+        RSC.centerFrame(RET);
+        RET.setVisible(true);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMTesterActionPerformed
+
+    private void jMIReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIReloadActionPerformed
+        jTPSource.setDocument(new DefaultStyledDocument());
+        jTPSource.setText("");
+        RSC.openFile(RSC.currentFN);
+        findProblems();
+        updateHighlighting();
+        jMISave.setEnabled(true);
+    }//GEN-LAST:event_jMIReloadActionPerformed
+
     public void gui2() {
         this.setTitle("Polisher "+RSC.VersionNumber);
         jTPSource.setFont(new java.awt.Font("Monospaced", 0, 24));
@@ -447,16 +472,16 @@ public class mainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMEdit;
     private javax.swing.JMenu jMFile;
-    private javax.swing.JMenuItem jMFindProblems;
     private javax.swing.JMenu jMHelp;
     private javax.swing.JMenuItem jMIAbout;
     private javax.swing.JMenuItem jMINextProblem;
     private javax.swing.JMenuItem jMIOpen;
     private javax.swing.JMenuItem jMIPreviousProblem;
+    private javax.swing.JMenuItem jMIReload;
     private javax.swing.JMenuItem jMISave;
     private javax.swing.JMenuItem jMReloadRules;
+    private javax.swing.JMenuItem jMTester;
     private javax.swing.JMenu jMTools;
-    private javax.swing.JMenuItem jMUpdateHighlighting;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;

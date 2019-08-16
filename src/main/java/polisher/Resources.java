@@ -6,6 +6,11 @@
 package polisher;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import static java.awt.SystemColor.info;
 import java.io.File;
 import java.io.IOException;
 import java.nio.CharBuffer;
@@ -14,11 +19,20 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
@@ -28,10 +42,11 @@ import javax.swing.text.StyleConstants;
  */
 public class Resources {
     
-    public final String VersionNumber = "v0.1";
-    private final mainFrame MF;
+    public final String VersionNumber = "v0.2";
+    public final String aboutText = "Polisher is an open source tool which helps with polishing LaTeX drafts of papers.";
+    public final mainFrame MF;
     public String currentFN;
-    public HashMap<Integer,ArrayList<Rule>> rules;
+    public HashMap<Integer,ArrayList<Rule>> globalRules;
     public ArrayList<Problem> problems;
     
     public final Color Green = new Color(58,153,0);
@@ -61,6 +76,24 @@ public class Resources {
         readRules();
     }
     
+    public void setComponentFont(Component[] comp)
+    {
+        for(int x = 0; x < comp.length; x++)
+        {
+          if(comp[x] instanceof Container) setComponentFont(((Container)comp[x]).getComponents());
+          try{comp[x].setFont(new java.awt.Font("Arial", 0, 22));}
+          catch(Exception e){}//do nothing
+        }
+    }    
+    
+    public void centerFrame(JDialog frame) {
+        GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        Rectangle r=environment.getDefaultScreenDevice().getDefaultConfiguration().getBounds();
+        //Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(r.width/2 - (frame.getWidth()/2),r.height/2 - (frame.getHeight()/2));
+    }
+    
+    
     public void openFile(String s) {
         MF.pcount=0;
         try {
@@ -78,7 +111,7 @@ public class Resources {
     }
     
     public void readRules() {
-        rules=new HashMap<Integer,ArrayList<Rule>>();
+        globalRules=new HashMap<Integer,ArrayList<Rule>>();
         try {
             String config = new String(Files.readAllBytes(Paths.get("rules.cfg")));
             String[] lines=config.split("\\n");
@@ -89,15 +122,15 @@ public class Resources {
                     if (lines[i].startsWith("@!")) {
                         String[] ls=lines[i+3].trim().split(" ");
                         Rule rule=new Rule(lines[i].substring(2),lines[i+1].trim(),lines[i+2].trim(),Integer.valueOf(ls[0]),Integer.valueOf(ls[1]));
-                        if (!rules.containsKey(rule.level)) rules.put(rule.level,(new ArrayList<Rule>()));
-                        rules.get(rule.level).add(rule);
+                        if (!globalRules.containsKey(rule.level)) globalRules.put(rule.level,(new ArrayList<Rule>()));
+                        globalRules.get(rule.level).add(rule);
                         System.out.println("Found rule:\n"+rule.toString());
                         i=i+3;
                     } else if (lines[i].startsWith("@")) {
                         String[] ls=lines[i+2].trim().split(" ");
                         Rule rule=new Rule(lines[i].substring(1),lines[i+1].trim(),"",Integer.valueOf(ls[0]),Integer.valueOf(ls[1]));
-                        if (!rules.containsKey(rule.level)) rules.put(rule.level,(new ArrayList<Rule>()));
-                        rules.get(rule.level).add(rule);
+                        if (!globalRules.containsKey(rule.level)) globalRules.put(rule.level,(new ArrayList<Rule>()));
+                        globalRules.get(rule.level).add(rule);
                         System.out.println("Found rule:\n"+rule.toString());
                         i=i+2;
                     }
@@ -108,14 +141,22 @@ public class Resources {
         }
     }
     
-    public void findProblems(String base) {
-        problems=new ArrayList<Problem>();
-        rules.forEach((key,rules) -> {
+    public void Information(java.awt.Component p, String msg,String head) {
+        JOptionPane.showMessageDialog(p,msg,head, JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    
+    public ArrayList<Problem> findProblems(String base, HashMap<Integer, ArrayList<Rule>> rules) {
+        ArrayList<Problem> problems=new ArrayList<Problem>();
+        int startBibPos=base.indexOf("@!@Bibliography@!@");
+        int startDoc=base.indexOf("\\begin{document}");
+        if ((startDoc>0) && (startBibPos<0)) Information(this.MF,"No Bibliography found","Attention!");
+        
+        rules.forEach((key,subRules) -> {
             String source=base;
             // adjust according to level
             if (key>0) {
-                int i=base.indexOf("\\begin{document}");
-                source=new String(new char[i])+source.substring(i);
+                if (startDoc>0) source=new String(new char[startDoc])+source.substring(startDoc);
             } 
             if (key==3) {
                 Matcher m = Pattern.compile("\\$[^\\$]+\\$").matcher(source);
@@ -126,10 +167,14 @@ public class Resources {
                     source=source.substring(0,m.start())+stringRepeat('@',m.end()-m.start())+source.substring(m.end());
                 System.out.println(source);
             } else if (key==90) {
-                int i=base.indexOf("@!@Bibliography@!@");
-                source=new String(new char[i])+source.substring(i);
+                if (startBibPos>0) {
+                    source=new String(new char[startBibPos])+source.substring(startBibPos);
+                } else {
+                    source=new String("");
+                }
             }
-            for (Rule rule : rules) {
+            for (Rule rule : subRules) {
+                System.out.println("Applying rule: "+rule.toString());
                 Matcher m = rule.pattern.matcher(source);
                 while(m.find()) {
                     boolean block=false;
@@ -155,10 +200,15 @@ public class Resources {
                 return lhs.start < rhs.start ? -1 : (lhs.start > rhs.start) ? 1 : 0;
             }
         });
+        return(problems);
     }
 
     private String stringRepeat(char c, int i) {
         return CharBuffer.allocate( i ).toString().replace( '\0', c );
+    }
+
+    void highlightProblems(ArrayList<Problem> problems, JTextPane jTPSource) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
