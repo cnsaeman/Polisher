@@ -6,6 +6,6 @@ The software is currently in an beta state. Suggestions for improvement are welc
 
 ## Releases
 
-The most recent .jar file is available under Releases, just download, put in a folder and run with java -jar ... Use at your own risk.
+A .zip with sample configuration, manual, and the most recent .jar file is available under Releases, just download, unzip into a folder and run with java -jar ... Use at your own risk.
 
 If you open a .tex-file, you should have the corresponding .bbl-file in the same folder.
