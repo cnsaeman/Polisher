@@ -1,0 +1,282 @@
+\documentclass[11pt]{article}
+% kate: default-dictionary en_US;
+\addtolength{\oddsidemargin}{-1.7cm}
+%\addtolength{\evensidemargin}{-5.3cm}
+\addtolength{\textwidth}{2.8cm} \topmargin -15mm \textheight 230mm
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+\definecolor{MyDarkBlue}{rgb}{0.15,0.25,0.45}
+\hypersetup{
+    colorlinks=true,
+    citecolor=MyDarkBlue,
+    linkcolor=MyDarkBlue,
+    urlcolor=MyDarkBlue,
+    pdfauthor={Christian S\"amann},
+    pdftitle={Polisher - Manual},
+    pdfsubject={hep-th}
+    breaklinks=true
+}
+
+\linespread{1.09}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Pseudo-Harvmac Anfang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setlength{\footnotesep}{3.5mm}
+
+\makeatletter\renewcommand{\section}{\@startsection
+    {section}{1}{\z@}{-3.5ex plus -1ex minus
+        -.2ex}{2.3ex plus .2ex}{\bf }}
+
+\makeatletter\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}{-3.25ex
+        plus -1ex minus
+        -.2ex}{1.5ex plus .2ex}{\it }}
+\makeatletter\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{-2.45ex}{-3.25ex
+        plus -1ex minus -.2ex}{1.5ex plus .2ex}{\it }}
+\renewcommand{\thesection}{\arabic{section}.}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}.}
+\renewcommand{\thesubsubsection}{}
+\renewcommand{\theequation}{\thesection\arabic{equation}}
+
+\let\fn\footnote
+\renewcommand{\footnote}[1]{\linespread{1.1}\fn{#1}\linespread{1.29}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Pseudo-Harvmac Ende
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\hyphenation{mani-folds mani-fold opera-tor bet-ween}
+
+%\usepackage{subeqn}
+%\usepackage{graphicx}
+%\usepackage{psfig}
+
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{bbm}
+%\usepackage{showlabels}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{rem}{Remark}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+%\usepackage{hyperref}
+\def\qed{\quad \vrule height7.5pt width6.5pt depth0pt}
+\def\slasha#1{\setbox0=\hbox{$#1$}#1\hskip-\wd0\hbox to\wd0{\hss\sl/\/\hss}}
+\def\period#1{\setbox0=\hbox{$#1$}#1\hskip-\wd0{}\hskip-\wd0{~-~}}
+\def\periodb#1{\setbox0=\hbox{$#1$}#1\hskip-\wd0\hbox to\wd0{-}}
+\newcommand{\subsub}[1]{\noindent{\bf #1}}
+\newcommand{\lsc}{\{\hspace{-0.1cm}[}
+\newcommand{\rsc}{]\hspace{-0.1cm}\}}
+\newcommand{\unit}{\mathbbm{1}}   % identity map/matrix
+\newcommand{\id}{\mathrm{id}}   % identity map/matrix
+\newcommand{\CA}{\mathcal{A}}    % super gauge potential
+\newcommand{\CB}{\mathcal{B}}    % super gauge potential
+\newcommand{\CC}{\mathcal{C}}    % super gauge potential
+\newcommand{\CD}{\mathcal{D}}    % f-theory
+\newcommand{\CF}{\mathcal{F}}    % f-theory
+\newcommand{\CG}{\mathcal{G}}    % f-theory
+\newcommand{\CH}{\mathcal{H}}    % bundle classification
+\newcommand{\CI}{\mathcal{I}}    % Lagrangian
+\newcommand{\CK}{\mathcal{K}}    % Lagrangian
+\newcommand{\CL}{\mathcal{L}}    % Lagrangian
+\newcommand{\CM}{\mathcal{M}}    % m-theory, manifold
+\newcommand{\CN}{\mathcal{N}}    % number of supersymmetries
+\newcommand{\CO}{\mathcal{O}}    % bundle classification
+\newcommand{\CP}{\mathcal{P}}    % twistor space
+\newcommand{\CS}{\mathcal{S}}    % real twistor space
+\newcommand{\CT}{\mathcal{T}}    % real twistor space
+\newcommand{\CU}{\mathcal{U}}    % patches
+\newcommand{\CV}{\mathcal{V}}    % Variety
+\newcommand{\CW}{\mathcal{W}}    % Minitwistor
+\newcommand{\CX}{\mathcal{X}}    % CY
+\newcommand{\CY}{\mathcal{Y}}    % CY
+\newcommand{\CZ}{\mathcal{Z}}    % CZ
+\newcommand{\CE}{\mathcal{E}}    % complex vector bundle
+\newcommand{\frg}{\mathfrak{g}}    % complex vector bundle
+\newcommand{\fra}{\mathfrak{a}}    % complex vector bundle
+\newcommand{\frA}{\mathfrak{A}}    % complex vector bundle
+\newcommand{\frF}{\mathfrak{F}}    % complex vector bundle
+\newcommand{\frG}{\mathfrak{G}}    % complex vector bundle
+\newcommand{\frH}{\mathfrak{H}}    % complex vector bundle
+\newcommand{\frN}{\mathfrak{N}}    % complex vector bundle
+\newcommand{\frS}{\mathfrak{S}}    % complex vector bundle
+\newcommand{\frU}{\mathfrak{U}}    % complex vector bundle
+\newcommand{\frX}{\mathfrak{X}}    % complex vector bundle
+\newcommand{\frv}{\mathfrak{v}}    % complex vector bundle
+\newcommand{\cb}{\,,\,}             % Coordinate comma
+\newcommand{\cm}{{}\hspace{-0.05cm}{}}             % Other spacing
+\newcommand{\XF}{\mathcal{X}}    % set of vector fields
+\newcommand{\FK}{\mathbbm{K}}     % field K
+\newcommand{\FR}{\mathbbm{R}}     % field of real numbers
+\newcommand{\FC}{\mathbbm{C}}     % field of complex numbers
+\newcommand{\FH}{\mathbbm{H}}     % field of quaternions
+\newcommand{\FO}{\mathbbm{O}}     % field of octonions
+\newcommand{\CPP}{{\mathbbm{C}P}}    % complex projective plane
+\newcommand{\HS}{\mathbbm{F}}     % Hirzebruch Surfaces
+\newcommand{\AlA}{\mathcal{A}}   % algebra A
+\newcommand{\AlC}{\mathcal{C}}   % algebra C (Clifford algebra)
+\newcommand{\NN}{\mathbbm{N}}     % set of natural numbers
+\newcommand{\RZ}{\mathbbm{Z}}     % ring of integers
+\newcommand{\dd}{\mathrm{d}}     % total differential
+\newcommand{\dpar}{\partial}     % partial differential
+\newcommand{\dparb}{{\bar{\partial}}}     % partial differential with bar
+\newcommand{\derr}[2]{\frac{\dpar #1}{\dpar #2}}   % partielle ableitung
+\newcommand{\dderr}[2]{\frac{\dd #1}{\dd #2}}   % totale ableitung
+\newcommand{\embd}{{\hookrightarrow}}     % embedded
+\newcommand{\diag}{{\mathrm{diag}}}     % embedded
+\newcommand{\dL}{\mathcal{L}}    % Lie differential
+\newcommand{\dD}{\mathcal{D}}    % Functional integral
+\newcommand{\de}{\mathrm{e}}     % Euler's number
+\newcommand{\di}{\mathrm{i}}     % imaginary unit
+\newcommand{\bi}{{\bar{\imath}}}     % bar \"{u}ber i
+\newcommand{\bj}{{\bar{\jmath}}}     % bar \"{u}ber j
+\newcommand{\be}{{\bar{1}}}     % bar \"{u}ber j
+\newcommand{\bz}{{\bar{z}}}     % bar \"{u}ber z
+\newcommand{\bpsi}{{\bar{\psi}}}     % bar \"{u}ber \theta
+\newcommand{\btheta}{{\bar{\theta}}}     % bar \"{u}ber \theta
+\newcommand{\bl}{{\bar{\lambda}}}     % bar \"{u}ber j
+\newcommand{\bs}{{\bar{\zeta}}}     % bar \"{u}ber j
+\newcommand{\bsigma}{{\bar{\sigma}}}     % bar \"{u}ber j
+\newcommand{\bw}{{\bar{w}}}     % bar \"{u}ber j
+\newcommand{\ald}{{\dot{\alpha}}}     % bar \"{u}ber j
+\newcommand{\bed}{{\dot{\beta}}}     % bar \"{u}ber j
+\newcommand{\gad}{{\dot{\gamma}}}     % bar \"{u}ber j
+\newcommand{\ded}{{\dot{\delta}}}     % bar \"{u}ber j
+\newcommand{\rhod}{{\dot{\rho}}}     % bar \"{u}ber j
+\newcommand{\sigd}{{\dot{\sigma}}}     % bar \"{u}ber j
+\newcommand{\eps}{{\varepsilon}}     % bar \"{u}ber j
+\newcommand{\tphi}{{\tilde{\phi}}}     % bar \"{u}ber j
+\newcommand{\eand}{{~~~\mbox{and}~~~}}     % bar \"{u}ber j
+\newcommand{\kernel}{{\mathrm{ker}}}     % bar \"{u}ber j
+\newcommand{\etr}{{\mathrm{etr}}}     % bar \"{u}ber j
+\newcommand{\edet}{{\mathrm{edet}}}     % bar \"{u}ber j
+\newcommand{\G}[3]{\Gamma^{#1}_{#2#3}}          % Christoffel symbols Gamma
+\newcommand{\der}[1]{\frac{\dpar}{\dpar #1}}   % partielle ableitung
+\newcommand{\dder}[1]{\frac{\dd}{\dd #1}}   % partielle ableitung
+\newcommand{\Der}[1]{\frac{\delta}{\delta #1}}   % funktionalableitung
+\newcommand{\tr}{\,\mathrm{tr}\,}     % trace
+\newcommand{\tra}[1]{\,\mathrm{tr}_{#1}\,}     % trace
+\newcommand{\T}{^{\mathrm{T}}}
+\newcommand{\dual}{^\vee}     % trace
+\newcommand{\sU}{\mathsf{U}}     % Euler's number
+\newcommand{\sV}{\mathsf{V}}     % Euler's number
+\newcommand{\sSU}{\mathsf{SU}}     % Euler's number
+\newcommand{\sSL}{\mathsf{SL}}     % Euler's number
+\newcommand{\sGL}{\mathsf{GL}}     % Euler's number
+\newcommand{\sSO}{\mathsf{SO}}     % Euler's number
+\newcommand{\sSpin}{\mathsf{Spin}}     % Euler's number
+\newcommand{\ssp}{\FR^{4|4\CN}}     % Euler's number
+\newcommand{\sspdef}{\FR^{4|4\CN}_\hbar}     % Euler's number
+\newcommand{\remark}[1]{}     % Euler's number
+\newcommand{\z}[1]{{\stackrel{\circ}{#1}}{}}     % Euler's number
+\newcommand{\ed}{{\dot{1}}}    % Functional integral
+\newcommand{\zd}{{\dot{2}}}    % Functional integral
+\newcommand{\drd}{{\dot{3}}}    % Functional integral
+
+
+\newcommand{\SA}{\CP^{3\oplus 2|0}}     % Euler's number
+\newcommand{\SB}{\CP^{3\oplus 1|0}}     % Euler's number
+
+\makeatletter \@addtoreset{equation}{section} \makeatother
+\renewcommand{\thesection}{\arabic{section}.}
+%\renewcommand{\theappendix}{\arabic{appendix}.}
+\renewcommand{\theequation}{\thesection\arabic{equation}}
+
+\begin{document}
+    \begin{center}
+        {\Huge Polisher\\[0.5cm] Version 1.0}\\[0.5cm]
+        {\large(w) by Christian S{\"a}mann, available under GPLv3} \vskip 2cm
+        %\includegraphics[width=13cm]{mansplash.jpg}
+    \end{center}
+    \vspace*{5cm}
+    \begin{quote}\large
+        Polisher is an open source LaTeX source file verification tool. It performs a number of basic sanity checks on a LaTeX file, identifying punctuation and formatting errors as well as typos. It is highly configurable.
+    \end{quote}
+    
+    
+    \newpage
+    
+    \tableofcontents
+    
+    \newpage
+    
+    \section{Overview}
+    
+    ...
+    
+    \section{Profiles}
+    
+    A collections of configuration files, together with a set of switches of which checks should be performed is called a {\bf profile}.
+    
+    Profiles are folders in \verb+/config+ which contain a configuration file with switches, called \verb+profile.cfg+. This file contains a line\verb+Name:<name of profile>+. 
+    
+    The profile folder also contains the configuration file for the individual checking modules.
+    
+    Note that in all configuration files, lines starting with \verb+%+ will be ignored.
+    
+    \section{Checking modules}
+    
+    Note that LaTeX code is interpreted as is, and no substitutions due to macros are being made.
+    
+    \subsection{PunctuationChecker}
+    
+    Only applied to body of document.
+    
+    This runs the following checks, which can be turned on and off:
+    
+    \verb+paragraph header needs to end with fullstop+: Each \verb+\paragraph{...}+ argument has to end with a fullstop.
+    
+    \verb+footnote punctuation+: If a footnote starts with a lowercase letter, it should not end in a fullstop. Also, footnotes should not end in a comma or semi-colon.
+    
+    \subsection{RegExpMatcher}
+
+    The key configuration file is \verb+regexps.cfg+. Each rule consists of two lines of the form\\    
+    \verb+<description>|<level>|<severity>|<parameters>+\\    
+    \verb+<regexp>+\\
+    with only the first entry mandatory in the first line. 
+    
+    Valid levels:\\
+    \hspace*{2cm}\begin{tabular}{cl}
+     1 & Body\\
+     90 & Bibliography
+    \end{tabular}
+    
+    Valid parameters:\\
+    \hspace*{2cm}\begin{tabular}{ll}
+    \verb+not_in_tags+ & the match cannot be in \verb+\cite+, \verb+\eqref+, or \verb+\cref+
+    \end{tabular}
+    
+    \subsection{Homogenizer}
+
+    The key configuration file is \verb+homogenizer.cfg+. This file contains a word list with each line of the following form:\\
+    \verb+<standard form>:<alternatives, separated by ;>|<exceptions, separated by ;>+
+    
+    \subsection{BibliographyChecker}
+    
+    Only applied to bibliography of document.
+    
+    The key configuration file is \verb+biliography.cfg+. Each line starting with \verb+journal-normalization+ is of the form\\
+    \verb+journal-normalization:<search-for>:<replace-by>+
+    
+    Checks for 
+    \begin{itemize}
+        \itemsep-1mm
+        \item Each bibitem needs to end in fullstop.
+        \item Make sure the journal names are standardised.
+    \end{itemize}
+    
+    
+    
+    
+    
+    \section{Acknowledgements}
+    
+    Libraries used:
+    \begin{itemize}
+        \item Usual Atlantis libraries
+    \end{itemize}
+    
+    
+\end{document}
